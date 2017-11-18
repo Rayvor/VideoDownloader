@@ -164,6 +164,7 @@ namespace VideoDownloader.App.BL
             {
                 ++clipCounter;
                 var postJson = BuildViewclipData(rpcData, moduleCounter, clipCounter);
+                var postJsonRetriveCaption = BuildViewclipCaptionData(rpcData, moduleCounter, clipCounter);
 
                 var fileName = GetFullFileNameWithoutExtension(clipCounter, moduleDirectory, clip);
 
@@ -177,6 +178,11 @@ namespace VideoDownloader.App.BL
                     {
                         throw new UnauthorizedException(Properties.Resources.CheckYourSubscription);
                     }
+                    
+                    if (viewclipResonse.Content == "Error loading clip")
+                    {
+                        throw new UnauthorizedException("Error loading clip");
+                    }
 
                     var clipFile = Newtonsoft.Json.JsonConvert.DeserializeObject<ClipFile>(viewclipResonse.Content);
 
@@ -184,6 +190,25 @@ namespace VideoDownloader.App.BL
                     {
                         IList<SrtRecord> formattedSubtitles = GetFormattedSubtitles(clipFile.Captions, clip.Duration);
                         _subtitleService.Write($"{fileName}.{Properties.Settings.Default.SubtitilesExtensionMp4}", formattedSubtitles);
+                    }
+                    else
+                    {
+                        ResponseEx viewclipCaptionResonse = await httpHelper.SendRequest(HttpMethod.Post,
+                                                new Uri(Properties.Settings.Default.ViewCaptionUrl),
+                                                postJsonRetriveCaption,
+                                                _token);
+                        if (viewclipCaptionResonse.Content == "Unauthorized")
+                        {
+                            throw new UnauthorizedException(Properties.Resources.CheckYourSubscription);
+                        }
+                        
+                        var captions = Newtonsoft.Json.JsonConvert.DeserializeObject<Caption[]>(viewclipCaptionResonse.Content);
+
+                        if (captions.Count() > 0)
+                        {
+                            IList<SrtRecord> formattedSubtitles = GetFormattedSubtitles(captions, clip.Duration);
+                            _subtitleService.Write($"{fileName}.{Properties.Settings.Default.SubtitilesExtensionMp4}", formattedSubtitles);
+                        }
                     }
 
                     await DownloadClip(new Uri(clipFile.Urls[1].Url),
@@ -327,6 +352,19 @@ namespace VideoDownloader.App.BL
                 ModuleName = module.Name,
                 MediaType = Properties.Settings.Default.ClipExtensionMp4,
                 Quality = rpcData.Payload.Course.SupportsWideScreenVideoFormats ? Properties.Settings.Default.Resolution1280x720 : Properties.Settings.Default.Resolution1024x768
+            };
+            return Newtonsoft.Json.JsonConvert.SerializeObject(viewclipData);
+        }
+        
+        private string BuildViewclipCaptionData(RpcData rpcData, int moduleCounter, int clipCounter)
+        {
+            Module module = rpcData.Payload.Course.Modules[moduleCounter - 1];
+            ViewclipCaptionData viewclipData = new ViewclipCaptionData()
+            {
+                Author = module.Author,
+                ClipIndex = clipCounter - 1,
+                Locale = Properties.Settings.Default.EnglishLocale,
+                ModuleName = module.Name
             };
             return Newtonsoft.Json.JsonConvert.SerializeObject(viewclipData);
         }
