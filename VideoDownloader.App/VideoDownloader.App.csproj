@@ -65,7 +65,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.6.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -189,6 +189,7 @@
     <Compile Include="Model\Subscription.cs" />
     <Compile Include="Model\Tool.cs" />
     <Compile Include="Model\UserAvatar.cs" />
+    <Compile Include="Model\ViewclipCaptionData.cs" />
     <Compile Include="Model\ViewclipData.cs" />
     <Compile Include="Properties\Resources.ru-RU.Designer.cs">
       <DependentUpon>Resources.ru-RU.resx</DependentUpon>

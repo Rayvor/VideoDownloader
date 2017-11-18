@@ -3,3 +3,6 @@
 ################################################################################
 
 /.vs/VideoDownloader/v15
+/packages
+/VideoDownloader.App/bin/Debug
+/VideoDownloader.App/obj/Debug
