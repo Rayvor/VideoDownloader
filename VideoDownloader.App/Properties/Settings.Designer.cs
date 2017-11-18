@@ -52,6 +52,17 @@ namespace VideoDownloader.App.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://app.pluralsight.com/player/retrieve-captions")]
+        public string ViewCaptionUrl
+        {
+            get
+            {
+                return ((string)(this["ViewCaptionUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("http://vid20.pluralsight.com")]
         public string ReferrerUrlForDownloading {
             get {
